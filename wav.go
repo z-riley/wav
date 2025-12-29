@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"time"
 )
 
 const HeaderSize = 44
@@ -80,4 +81,9 @@ func NewHeader(b []byte) (*Header, error) {
 		BitsPerSample: bitsPerSample,
 		DataSize:      binary.LittleEndian.Uint32(b[40:44]),
 	}, nil
+}
+
+func (h *Header) Duration() time.Duration {
+	nanos := float64(h.DataSize) / float64(h.ByteRate) * 1e9
+	return time.Duration(nanos)
 }
