@@ -106,11 +106,12 @@ func NewHeaderFromPath(path string) (*Header, error) {
 func (h *Header) String() string {
 	return fmt.Sprintf("Size (bytes): %d\n", h.Size) +
 		fmt.Sprintf("Channels: %d\n", h.Channels) +
-		fmt.Sprintf("SampleRate (Hz): %d\n", h.SampleRate) +
-		fmt.Sprintf("ByteRate (bytes/sec): %d\n", h.ByteRate) +
-		fmt.Sprintf("BlockAlign (bytes): %d\n", h.BlockAlign) +
-		fmt.Sprintf("DataSize (bytes): %d\n", h.BitsPerSample) +
-		fmt.Sprintf("Duration (s): %f", h.Duration().Seconds())
+		fmt.Sprintf("Sample rate (Hz): %d\n", h.SampleRate) +
+		fmt.Sprintf("Byte rate (bytes/sec): %d\n", h.ByteRate) +
+		fmt.Sprintf("Block align (bytes): %d\n", h.BlockAlign) +
+		fmt.Sprintf("Bits per sample: %d\n", h.BitsPerSample) +
+		fmt.Sprintf("Data size (bytes): %d\n", h.DataSize) +
+		fmt.Sprintf("Duration: %s", h.Duration())
 }
 
 func (h *Header) MarshalJSON() ([]byte, error) {
