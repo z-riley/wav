@@ -15,14 +15,15 @@ type Header struct {
 	Channels uint16
 	// SampleRate is the sampling frequency (e.g., 44100 Hz).
 	SampleRate uint32
-	// ByteRate is SampleRate * NumChannels * BitsPerSample / 8.
+	// ByteRate is SampleRate * NumChannels * BitsPerSample / 8. This value is the average number
+	// of bytes per second at which the waveform data should be transferred.
 	ByteRate uint32
 	// BlockAlign is NumChannels * BitsPerSample / 8.
 	BlockAlign uint16
 	// BitsPerSample is the bit depth (e.g., 16, 24, or 32 bits).
 	BitsPerSample uint16
-	// Subchunk2Size is the number of bytes in the data section.
-	Subchunk2Size uint32
+	// DataSize is the number of bytes in the data section.
+	DataSize uint32
 }
 
 func NewHeader(b []byte) (*Header, error) {
@@ -56,13 +57,27 @@ func NewHeader(b []byte) (*Header, error) {
 		return nil, fmt.Errorf("expected 'data', got %s", string(b))
 	}
 
+	channels := binary.LittleEndian.Uint16(b[22:24])
+	sampleRate := binary.LittleEndian.Uint32(b[24:28])
+	byteRate := binary.LittleEndian.Uint32(b[28:32])
+	blockAlign := binary.LittleEndian.Uint16(b[32:34])
+	bitsPerSample := binary.LittleEndian.Uint16(b[34:36])
+
+	if byteRate != sampleRate*uint32(channels)*uint32(bitsPerSample)/8 {
+		return nil, errors.New("incorrect byte rate")
+	}
+
+	if blockAlign != channels*bitsPerSample/8 {
+		return nil, errors.New("incorrect byte rate")
+	}
+
 	return &Header{
 		Size:          binary.LittleEndian.Uint32(b[4:8]),
-		Channels:      binary.LittleEndian.Uint16(b[22:24]),
-		SampleRate:    binary.LittleEndian.Uint32(b[24:28]),
-		ByteRate:      binary.LittleEndian.Uint32(b[28:32]),
-		BlockAlign:    binary.LittleEndian.Uint16(b[32:34]),
-		BitsPerSample: binary.LittleEndian.Uint16(b[34:36]),
-		Subchunk2Size: binary.LittleEndian.Uint32(b[40:44]),
+		Channels:      channels,
+		SampleRate:    sampleRate,
+		ByteRate:      byteRate,
+		BlockAlign:    blockAlign,
+		BitsPerSample: bitsPerSample,
+		DataSize:      binary.LittleEndian.Uint32(b[40:44]),
 	}, nil
 }
