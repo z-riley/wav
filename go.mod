@@ -1,4 +1,4 @@
-module z-riley/wav
+module github.com/z-riley/wav
 
 go 1.23.4
 
