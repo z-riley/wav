@@ -2,6 +2,12 @@
 
 CLI tool for decoding WAV file headers.
 
+## Installation
+
+```
+go install github.com/z-riley/wav@latest
+```
+
 ## Example Usage
 
 ```
