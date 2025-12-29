@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"time"
 )
 
@@ -82,6 +84,21 @@ func NewHeader(b []byte) (*Header, error) {
 		BitsPerSample: bitsPerSample,
 		DataSize:      binary.LittleEndian.Uint32(b[40:44]),
 	}, nil
+}
+
+func NewHeaderFromPath(path string) (*Header, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := make([]byte, HeaderSize)
+	_, err = io.ReadAtLeast(f, buf, HeaderSize)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewHeader(buf)
 }
 
 func (h *Header) String() string {

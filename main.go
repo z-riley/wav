@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -31,7 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	header, err := parseHeader(absPath)
+	header, err := NewHeaderFromPath(absPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -53,19 +52,4 @@ func main() {
 		pflag.Usage()
 		os.Exit(1)
 	}
-}
-
-func parseHeader(path string) (*Header, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	buf := make([]byte, HeaderSize)
-	_, err = io.ReadAtLeast(f, buf, HeaderSize)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewHeader(buf)
 }
