@@ -12,6 +12,8 @@ import (
 
 const HeaderSize = 44
 
+var ErrIncorrectFormat = errors.New("incorrect file format")
+
 type Header struct {
 	// Size is the number of bytes in the file minus 8 for the RIFF and size fields.
 	Size uint32
@@ -36,11 +38,11 @@ func NewHeader(b []byte) (*Header, error) {
 	}
 
 	if string(b[0:4]) != "RIFF" {
-		return nil, fmt.Errorf("not RIFF chunk")
+		return nil, fmt.Errorf("%w: expected RIFF", ErrIncorrectFormat)
 	}
 
 	if string(b[8:12]) != "WAVE" {
-		return nil, fmt.Errorf("not WAVE format")
+		return nil, fmt.Errorf("%w: expected WAVE", ErrIncorrectFormat)
 	}
 
 	if string(b[12:16]) != "fmt " {
