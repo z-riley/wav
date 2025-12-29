@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -81,6 +82,40 @@ func NewHeader(b []byte) (*Header, error) {
 		BitsPerSample: bitsPerSample,
 		DataSize:      binary.LittleEndian.Uint32(b[40:44]),
 	}, nil
+}
+
+func (h *Header) String() string {
+	return fmt.Sprintf("Size (bytes): %d\n", h.Size) +
+		fmt.Sprintf("Channels: %d\n", h.Channels) +
+		fmt.Sprintf("SampleRate (Hz): %d\n", h.SampleRate) +
+		fmt.Sprintf("ByteRate (bytes/sec): %d\n", h.ByteRate) +
+		fmt.Sprintf("BlockAlign (bytes): %d\n", h.BlockAlign) +
+		fmt.Sprintf("DataSize (bytes): %d\n", h.BitsPerSample) +
+		fmt.Sprintf("Duration (s): %f", h.Duration().Seconds())
+}
+
+func (h *Header) MarshalJSON() ([]byte, error) {
+	type jsonHeader struct {
+		Size          uint32  `json:"size"`
+		Channels      uint16  `json:"channels"`
+		SampleRate    uint32  `json:"sampleRate"`
+		ByteRate      uint32  `json:"byteRate"`
+		BlockAlign    uint16  `json:"blockAlign"`
+		BitsPerSample uint16  `json:"bitsPerSample"`
+		DataSize      uint32  `json:"dataSize"`
+		Duration      float64 `json:"duration"`
+	}
+
+	return json.Marshal(jsonHeader{
+		Size:          h.Size,
+		Channels:      h.Channels,
+		SampleRate:    h.SampleRate,
+		ByteRate:      h.ByteRate,
+		BlockAlign:    h.BlockAlign,
+		BitsPerSample: h.BitsPerSample,
+		DataSize:      h.DataSize,
+		Duration:      h.Duration().Seconds(),
+	})
 }
 
 func (h *Header) Duration() time.Duration {
